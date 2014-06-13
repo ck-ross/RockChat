@@ -6,7 +6,7 @@ var userNames = (function () {
     if (!name || names[name]) {
       return false;
     } else {
-      names[name] = true;
+      names[name] = { name: name, room: 'Lobby'};
       return true;
     }
   };
@@ -24,11 +24,17 @@ var userNames = (function () {
     return name;
   };
 
+  var setRoom = function (name, newRoom) {
+    if(names[name]) {
+      names[name].room = newRoom;
+    }
+  }
+
   // serialize claimed names as an array
   var get = function () {
     var res = [];
     for (user in names) {
-      res.push(user);
+      res.push(names[user]);
     }
 
     return res;
@@ -44,6 +50,7 @@ var userNames = (function () {
     claim: claim,
     free: free,
     get: get,
+    setRoom: setRoom,
     getGuestName: getGuestName
   };
 }());
@@ -51,21 +58,26 @@ var userNames = (function () {
 // export function for listening to the socket
 module.exports = function (socket) {
   var name = userNames.getGuestName();
+  var room = 'Lobby';
 
   // send the new user their name and a list of users
   socket.emit('init', {
+    room: room,
     name: name,
     users: userNames.get()
   });
 
   // notify other clients that a new user has joined
   socket.broadcast.emit('user:join', {
-    name: name
+    name: name,
+    room: room
   });
 
   // broadcast a user's message to other users
   socket.on('send:message', function (data) {
     socket.broadcast.emit('send:message', {
+      room: data.room,
+      timestamp: data.timestamp,
       user: name,
       text: data.message
     });
@@ -88,6 +100,19 @@ module.exports = function (socket) {
     } else {
       fn(false);
     }
+  });
+
+  // validate a user's room change, and broadcast it on success
+  socket.on('change:room', function (data, fn) {
+    socket.broadcast.emit('change:room', {
+      oldName: name,
+      newRoom: data.room
+    });
+
+    userNames.setRoom(name, data.room);
+    room = data.room;
+    
+    fn(true);
   });
 
   // clean up when a user leaves, and broadcast it to other users

@@ -4,15 +4,15 @@ block body
   h1 Angular Socket.io IM Demo App
   div(ng-controller='AppCtrl')
     .col
-      h3 Messages
+      h3 {{room || 'Unknown'}} 
       .overflowable
         p(ng-repeat='message in messages',
-          ng-class='{alert: message.user == "chatroom"}') {{message.user}}: {{message.text}}
-
+          ng-class='{alert: message.user == "chatroom"}') {{message.timestamp|date : 'medium'}}.{{message.user}}: {{message.text}}
+              
     .col
       h3 Users
       .overflowable
-        p(ng-repeat='user in users') {{user}}
+        p(ng-repeat='user in users') {{user.name}} in {{user.room}}
 
     .clr
       form(ng-submit='sendMessage()')
@@ -26,6 +26,13 @@ block body
       form(ng-submit='changeName()')
         input(ng-model='newName')
         input(type='submit', value='Change Name')
+
+    .clr
+      h3 Change your room
+      p Your current room is {{room}}
+      form(ng-submit='changeRoom()')
+        input(ng-model='newRoom')
+        input(type='submit', value='Change Room')
 
   script(src='js/lib/angular/angular.js')
   script(src='/socket.io/socket.io.js')
