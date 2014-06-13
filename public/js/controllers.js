@@ -125,6 +125,7 @@ function AppCtrl($scope, socket) {
   $scope.sendMessage = function () {
     socket.emit('send:message', {
       room: $scope.room,
+      timestamp: new Date(),
       message: $scope.message
     });
 

@@ -77,6 +77,7 @@ module.exports = function (socket) {
   socket.on('send:message', function (data) {
     socket.broadcast.emit('send:message', {
       room: data.room,
+      timestamp: data.timestamp,
       user: name,
       text: data.message
     });
