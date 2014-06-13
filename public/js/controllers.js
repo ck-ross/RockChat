@@ -93,7 +93,7 @@ function AppCtrl($scope, socket) {
       name: $scope.newName
     }, function (result) {
       if (!result) {
-        alert('There was an error changing your name');
+        alert('There was an error changing your name.');
       } else {
         
         changeName($scope.name, $scope.newName);
@@ -109,7 +109,7 @@ function AppCtrl($scope, socket) {
       room: $scope.newRoom
     }, function (result) {
       if (!result) {
-        alert('There was an error changing your name');
+        alert('There was an error changing your name.');
       } else {
         
         changeRoom($scope.name, $scope.newRoom);
@@ -132,6 +132,7 @@ function AppCtrl($scope, socket) {
     $scope.messages.push({
       room: $scope.room,
       user: $scope.name,  
+      timestamp: new Date(),
       text: $scope.message
     });
 
